@@ -2,7 +2,7 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-resource "aws_instance" "abhishek" {
+resource "aws_instance" "my_instance" {
   instance_type = "t3.micro"
   ami = "ami-05fcfb9614772f051" # change this
 }
