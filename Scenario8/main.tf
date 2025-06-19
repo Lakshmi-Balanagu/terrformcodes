@@ -1,21 +1,34 @@
 variable "regions" {
-  default = ["ap-south-1", "us-east-1", "eu-west-1"]
+  type    = list(string)
+  default = ["us-east-1", "us-west-2", "eu-central-1"]
 }
 
-resource "aws_cloudwatch_dashboard" "example" {
+provider "aws" {
+  alias  = "default"
+  region = "us-east-1" # default region
+}
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias  = "us-west-2"
+  region = "us-west-2"
+}
+
+provider "aws" {
+  alias  = "eu-central-1"
+  region = "eu-central-1"
+}
+
+module "cloudwatch_dashboard" {
   for_each = toset(var.regions)
 
-  provider = aws
-
-  dashboard_name = "dashboard-${each.key}"
-  dashboard_body = jsonencode({
-    widgets = [
-      {
-        type = "text",
-        properties = {
-          markdown = "# Dashboard for ${each.key}"
-        }
-      }
-    ]
-  })
+  source   = "./modules/dashboard"
+  region   = each.key
+  providers = {
+    aws = aws.${each.key}
+  }
 }
